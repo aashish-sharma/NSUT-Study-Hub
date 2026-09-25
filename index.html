@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" data-theme="system">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="NSUT First Year Study Resources — Notes, PYQs, playlists, and more for all 37 subjects." />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6F7F9" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0E1218" />
+    <title>Study Hub | NSUT First Year Resources</title>
+    <meta property="og:title" content="Study Hub | NSUT First Year Resources" />
+    <meta property="og:description" content="Notes, playlists, PYQs and practical files for all 37 first-year subjects." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      (function() {
+        try {
+          var savedTheme = localStorage.getItem('theme');
+          var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (savedTheme === 'dark' || (savedTheme !== 'light' && systemDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

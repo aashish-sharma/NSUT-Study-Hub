@@ -11,6 +11,7 @@
   --color-border: var(--theme-border);
   --color-accent: var(--theme-accent);
   --color-badge-imp: var(--theme-badge-imp);
+  --color-success: var(--theme-success);
   
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;
   
@@ -38,6 +39,7 @@
   --theme-border: #DCE0E7;
   --theme-accent: #1F4FBF;
   --theme-badge-imp: #B45309;
+  --theme-success: #1F8A4C;
 }
 
 [data-theme="dark"] {
@@ -49,6 +51,7 @@
   --theme-border: #262D38;
   --theme-accent: #7CA4FF;
   --theme-badge-imp: #F2B45A;
+  --theme-success: #4ADE80;
   color-scheme: dark;
 }
 

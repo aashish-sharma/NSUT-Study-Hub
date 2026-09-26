@@ -4,9 +4,10 @@ import { LinkRow } from "./LinkRow";
 interface UnitGroupProps {
   unit: number | null;
   links: Link[];
+  subjectId: string;
 }
 
-export function UnitGroup({ unit, links }: UnitGroupProps) {
+export function UnitGroup({ unit, links, subjectId }: UnitGroupProps) {
   const label = unit === null ? "General" : `Unit ${unit}`;
 
   return (
@@ -19,7 +20,7 @@ export function UnitGroup({ unit, links }: UnitGroupProps) {
       </div>
       <div className="flex flex-col">
         {links.map((link) => (
-          <LinkRow key={link.url} link={link} />
+          <LinkRow key={link.url} link={link} subjectId={subjectId} />
         ))}
       </div>
     </div>

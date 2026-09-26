@@ -8,9 +8,10 @@ interface CategorySectionProps {
   links: Link[];
   grouping?: boolean;
   gaps?: string[];
+  subjectId: string;
 }
 
-export function CategorySection({ id, title, links, grouping, gaps = [] }: CategorySectionProps) {
+export function CategorySection({ id, title, links, grouping, gaps = [], subjectId }: CategorySectionProps) {
   if (links.length === 0 && gaps.length === 0) return null;
 
   return (
@@ -41,14 +42,14 @@ export function CategorySection({ id, title, links, grouping, gaps = [] }: Categ
               });
 
               return sortedGroups.map((g) => (
-                <UnitGroup key={g.unit ?? "general"} unit={g.unit} links={g.links} />
+                <UnitGroup key={g.unit ?? "general"} unit={g.unit} links={g.links} subjectId={subjectId} />
               ));
             })()
           ) : (
             // Flat list
             <div className="flex flex-col">
               {links.map((link) => (
-                <LinkRow key={link.url} link={link} />
+                <LinkRow key={link.url} link={link} subjectId={subjectId} />
               ))}
             </div>
           )}

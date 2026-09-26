@@ -133,7 +133,11 @@ export function LandingPage() {
                   <div className="text-[var(--text-sm-fluid)] font-medium text-[var(--l-muted)] mb-2">
                     Pinned subject
                   </div>
-                  <SubjectRow subject={previewSubject} />
+                  <SubjectRow 
+                    subject={previewSubject} 
+                    isPinned={true} 
+                    onTogglePin={(e) => { e.preventDefault(); e.stopPropagation(); }} 
+                  />
                 </div>
               </div>
             </div>

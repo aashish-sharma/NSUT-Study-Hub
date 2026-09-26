@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
 import { loadSubjects } from "../data/loader";
 import { CategorySection } from "../components/CategorySection";
@@ -6,6 +6,11 @@ import { SectionNav } from "../components/SectionNav";
 import { useActiveSection } from "../hooks/useActiveSection";
 import { ExamBanner, useExamMode } from "../components/ExamBanner";
 import knownGaps from "../data/known-gaps.json";
+import { storage } from "../lib/storage";
+import { StarToggle } from "../components/StarToggle";
+import { Toast } from "../components/Toast";
+import { ProgressBar } from "../components/ProgressBar";
+import { Share2 } from "lucide-react";
 
 const CATEGORIES = [
   { id: "syllabus", label: "Syllabus", grouping: false },
@@ -64,6 +69,69 @@ export function SubjectPage() {
 
   const activeId = useActiveSection(sectionsData.map((s) => s.id));
 
+  const [isPinned, setIsPinned] = useState(false);
+  const [toast, setToast] = useState({ isOpen: false, message: "" });
+
+  useEffect(() => {
+    if (!subject) return;
+
+    // Check if pinned
+    const allSubjects = loadSubjects();
+    setIsPinned(storage.readPinned(allSubjects).includes(subject.id));
+
+    // Record as recent (guard against duplicate writes)
+    const recents = storage.readRecents(allSubjects);
+    if (recents[0] !== subject.id) {
+      const nextRecents = [subject.id, ...recents.filter(r => r !== subject.id)];
+      storage.writeRecents(nextRecents);
+    }
+  }, [subject]);
+
+  const handleTogglePin = () => {
+    if (!subject) return;
+    const allSubjects = loadSubjects();
+    const pins = storage.readPinned(allSubjects);
+    const nextPins = pins.includes(subject.id) 
+      ? pins.filter(p => p !== subject.id) 
+      : [...pins, subject.id];
+    storage.writePinned(nextPins);
+    setIsPinned(nextPins.includes(subject.id));
+  };
+
+  const [completedCount, setCompletedCount] = useState(0);
+
+  useEffect(() => {
+    if (!subject) return;
+    const checkState = () => {
+      const allSubjects = loadSubjects();
+      const completed = storage.readCompletedLinks(allSubjects);
+      setCompletedCount(completed.filter(c => c.subjectId === subject.id).length);
+    };
+    checkState();
+    window.addEventListener("studyhub:storage-update", checkState);
+    return () => window.removeEventListener("studyhub:storage-update", checkState);
+  }, [subject]);
+
+  const handleShare = async () => {
+    if (!subject) return;
+    const shareData = {
+      title: subject.name,
+      text: `Check out ${subject.name} resources on Study Hub`,
+      url: window.location.href,
+    };
+    
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // Ignored, user might have cancelled
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      setToast({ isOpen: true, message: "Link copied" });
+    }
+  };
+
   if (!subject) {
     return (
       <main id="main-content" className="max-w-[1120px] mx-auto px-4 py-16 text-center">
@@ -88,9 +156,24 @@ export function SubjectPage() {
 
         {/* Main Content */}
         <div className="flex-1 px-4 py-6 min-[900px]:py-8 min-[900px]:px-8 min-w-0">
-          <h1 className="text-[var(--text-xl-fluid)] font-bold text-[var(--color-text)] mb-6">
-            {subject.name}
-          </h1>
+          <div className="flex items-start justify-between gap-4 mb-6">
+            <h1 className="text-[var(--text-xl-fluid)] font-bold text-[var(--color-text)]">
+              {subject.name}
+            </h1>
+            <div className="flex items-center gap-2 shrink-0 -mt-2">
+              <button
+                onClick={handleShare}
+                className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-[var(--radius-base)] transition-colors text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+                aria-label="Share subject"
+              >
+                <Share2 size={20} strokeWidth={2} />
+              </button>
+              <StarToggle isPinned={isPinned} onToggle={handleTogglePin} />
+            </div>
+          </div>
+          <div className="mb-6 max-w-sm">
+            <ProgressBar completed={completedCount} total={subject.links.length} />
+          </div>
 
           {examMode && <ExamBanner subjectId={subject.id} />}
 
@@ -112,6 +195,7 @@ export function SubjectPage() {
                 title={sec.label}
                 links={sec.links}
                 grouping={sec.grouping}
+                subjectId={subject.id}
               />
             ))}
 
@@ -130,6 +214,7 @@ export function SubjectPage() {
           </div>
         </div>
       </div>
+      <Toast isOpen={toast.isOpen} message={toast.message} onClose={() => setToast((prev: typeof toast) => ({ ...prev, isOpen: false }))} />
     </main>
   );
 }

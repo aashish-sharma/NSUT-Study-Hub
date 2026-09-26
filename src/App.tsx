@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from "react-router";
 import { LandingPage } from "./pages/LandingPage";
 import { SubjectsPage } from "./pages/SubjectsPage";
 import { SubjectPage } from "./pages/SubjectPage";
+import { SavedPage } from "./pages/SavedPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ToolsPage } from "./pages/ToolsPage";
 import { CgpaPage } from "./pages/CgpaPage";
@@ -28,6 +29,7 @@ function AppContent() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/subjects" element={<SubjectsPage />} />
           <Route path="/subject/:id" element={<SubjectPage />} />
+          <Route path="/saved" element={<SavedPage />} />
           <Route path="/tools" element={<ToolsPage />} />
           <Route path="/tools/cgpa" element={<CgpaPage />} />
           <Route path="/tools/sgpa" element={<SgpaPage />} />

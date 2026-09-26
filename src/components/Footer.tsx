@@ -7,7 +7,7 @@ export function Footer() {
         <p>{SITE.footer.credit}</p>
         
         {SITE.links.feedback && (
-          <div className="mt-4">
+          <div className="mt-4 mb-6">
             <a 
               href={SITE.links.feedback}
               target="_blank"
@@ -18,6 +18,9 @@ export function Footer() {
             </a>
           </div>
         )}
+        <p className="mt-4 text-[12px] opacity-75 max-w-lg mx-auto">
+          Note: You can install this app to load the interface offline, but actual resource links (Drive, YouTube) will still require an internet connection.
+        </p>
       </div>
     </footer>
   );

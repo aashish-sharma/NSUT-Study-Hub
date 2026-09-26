@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import { Routes, Route, useLocation } from "react-router";
 import { LandingPage } from "./pages/LandingPage";
 import { SubjectsPage } from "./pages/SubjectsPage";
@@ -40,6 +41,7 @@ function AppContent() {
 
 function App() {
   return <AppContent />;
+  return <Analytics />;
 }
 
 export default App;

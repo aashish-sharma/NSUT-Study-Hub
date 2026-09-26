@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { loadSubjects } from "../data/loader";
 import { SearchInput } from "../components/SearchInput";
 import { SubjectRow } from "../components/SubjectRow";
+import { ExamStrip } from "../components/ExamStrip";
 
 export function SubjectsPage() {
   const [search, setSearch] = useState("");
@@ -28,6 +29,7 @@ export function SubjectsPage() {
 
   return (
     <main id="main-content" className="max-w-[1120px] mx-auto px-4 py-8">
+      <ExamStrip />
       <SearchInput value={search} onChange={setSearch} />
       
       <div className="mb-4 text-[var(--color-muted)] text-[var(--text-sm-fluid)] font-medium px-1">

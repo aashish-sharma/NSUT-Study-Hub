@@ -96,3 +96,83 @@ export const storage = {
     return user !== null;
   }
 };
+
+// ---------------------------------------------------------------------------
+// Exams
+// ---------------------------------------------------------------------------
+
+import { daysUntil } from "./dates";
+import type { Subject } from "../data/schema";
+
+export const EXAM_TYPES = ["CT", "Midsem", "Endsem", "Practical", "Other"] as const;
+export type ExamType = (typeof EXAM_TYPES)[number];
+
+export interface Exam {
+  id: string;
+  subjectId: string | null;
+  type: ExamType;
+  label: string;
+  date: string;  // YYYY-MM-DD
+}
+
+const ExamSchema = z.object({
+  id: z.string(),
+  subjectId: z.string().nullable(),
+  type: z.enum(EXAM_TYPES),
+  label: z.string(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+
+const ExamsArraySchema = z.array(ExamSchema);
+
+/**
+ * Read exams from storage.
+ * - Validates each subjectId against the provided subjects list;
+ *   exams pointing at a nonexistent subject are silently dropped.
+ * - Prunes exams where daysUntil(date) < -1 (auto-remove exams
+ *   more than a day past).
+ * - Only writes the pruned list back if it actually differs from
+ *   what was read (guard by length comparison after pruning).
+ */
+export function readExams(subjects: Subject[]): Exam[] {
+  const raw = readItem("exams", ExamsArraySchema, []);
+  const subjectIds = new Set(subjects.map((s) => s.id));
+
+  const pruned = raw.filter((exam) => {
+    // Drop exams pointing at a subject that no longer exists
+    if (exam.subjectId !== null && !subjectIds.has(exam.subjectId)) return false;
+    // Drop exams more than a day past
+    if (daysUntil(exam.date) < -1) return false;
+    return true;
+  });
+
+  // Only write back if pruning actually removed entries
+  if (pruned.length !== raw.length) {
+    writeItem("exams", pruned);
+  }
+
+  return pruned;
+}
+
+export function writeExams(exams: Exam[]): void {
+  writeItem("exams", exams);
+  window.dispatchEvent(new Event("studyhub:storage-update"));
+}
+
+export function addExam(exam: Exam, existing: Exam[]): Exam[] {
+  const next = [...existing, exam];
+  writeExams(next);
+  return next;
+}
+
+export function updateExam(updated: Exam, existing: Exam[]): Exam[] {
+  const next = existing.map((e) => (e.id === updated.id ? updated : e));
+  writeExams(next);
+  return next;
+}
+
+export function deleteExam(id: string, existing: Exam[]): Exam[] {
+  const next = existing.filter((e) => e.id !== id);
+  writeExams(next);
+  return next;
+}

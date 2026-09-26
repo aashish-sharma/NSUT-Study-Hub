@@ -8,6 +8,7 @@ import { ToolsPage } from "./pages/ToolsPage";
 import { CgpaPage } from "./pages/CgpaPage";
 import { SgpaPage } from "./pages/SgpaPage";
 import { AttendancePage } from "./pages/AttendancePage";
+import { ExamsPage } from "./pages/ExamsPage";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { SkipToContent } from "./components/SkipToContent";
@@ -31,6 +32,7 @@ function AppContent() {
           <Route path="/tools/cgpa" element={<CgpaPage />} />
           <Route path="/tools/sgpa" element={<SgpaPage />} />
           <Route path="/tools/attendance" element={<AttendancePage />} />
+          <Route path="/exams" element={<ExamsPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

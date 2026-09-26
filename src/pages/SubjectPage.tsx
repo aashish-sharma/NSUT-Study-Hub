@@ -4,6 +4,7 @@ import { loadSubjects } from "../data/loader";
 import { CategorySection } from "../components/CategorySection";
 import { SectionNav } from "../components/SectionNav";
 import { useActiveSection } from "../hooks/useActiveSection";
+import { ExamBanner, useExamMode } from "../components/ExamBanner";
 import knownGaps from "../data/known-gaps.json";
 
 const CATEGORIES = [
@@ -40,24 +41,26 @@ export function SubjectPage() {
     }
   }, [subject]);
 
+  const examMode = useExamMode(subject?.id ?? "");
+
   const sectionsData = useMemo(() => {
     if (!subject) return [];
     
-    return CATEGORIES.map((cat) => {
+    const sections = CATEGORIES.map((cat) => {
       const links = subject.links.filter((l) => l.category === cat.id);
-      
-      // Load known gaps for this subject, but we don't have category specific gaps in known-gaps.json right now!
-      // The instruction said: "mathematics-1: 'Tutorial 4 and 5 solutions'"
-      // Which section does this go to? We don't have category mapped for gaps, so we'll just put it in a special "Known Gaps" section?
-      // Wait, "render those under a small "Not available yet" note."
-      // The gaps in `known-gaps.json` are an array of strings. If we don't know the category, how do we render it?
-      // Maybe we render gaps at the end or top? Or we just map the array. Let's look at the instruction again:
-      // "Do NOT render empty sections on the subject page or in the section nav. Add src/data/known-gaps.json (subjectId -> array of strings) and render those under a small "Not available yet" note."
-      // So maybe "Known gaps" is not its own category, but a section of its own, or maybe we just check if it has links. If the user didn't specify the category for gaps, maybe I just create a single "Coming Soon" or "Not available yet" section at the bottom?
-      // "render those under a small 'Not available yet' note". Let's put this below all sections.
       return { ...cat, links };
     }).filter((cat) => cat.links.length > 0);
-  }, [subject]);
+
+    // Exam mode: reorder so PYQs and Revision appear first
+    if (examMode) {
+      const priority = new Set(["pyq", "revision"]);
+      const prioritySections = sections.filter((s) => priority.has(s.id));
+      const rest = sections.filter((s) => !priority.has(s.id));
+      return [...prioritySections, ...rest];
+    }
+
+    return sections;
+  }, [subject, examMode]);
 
   const activeId = useActiveSection(sectionsData.map((s) => s.id));
 
@@ -88,6 +91,8 @@ export function SubjectPage() {
           <h1 className="text-[var(--text-xl-fluid)] font-bold text-[var(--color-text)] mb-6">
             {subject.name}
           </h1>
+
+          {examMode && <ExamBanner subjectId={subject.id} />}
 
           {subject.notes.length > 0 && (
             <div className="bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 rounded-[var(--radius-base)] p-4 mb-8">

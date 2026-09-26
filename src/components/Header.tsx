@@ -85,6 +85,12 @@ export function Header() {
 
           <div className="flex items-center gap-2">
             <Link
+              to="/exams"
+              className="text-[var(--text-sm-fluid)] font-medium text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors flex items-center min-h-[44px]"
+            >
+              Exams
+            </Link>
+            <Link
               to="/tools"
               className="text-[var(--text-sm-fluid)] font-medium text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors flex items-center min-h-[44px]"
             >
